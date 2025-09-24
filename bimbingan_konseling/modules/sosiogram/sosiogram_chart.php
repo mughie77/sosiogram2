@@ -148,27 +148,42 @@ document.addEventListener('DOMContentLoaded', function() {
             id: 'backgroundPlugin',
             beforeDraw: (chart) => {
                 const ctx = chart.ctx;
-                const dataset = chart.data.datasets[0];
-                const pointRadius = dataset.pointRadius || 15;
-                const borderWidth = dataset.pointBorderWidth || 2;
-                const totalRadius = pointRadius + borderWidth;
-                const padding = 2; // Jarak antara ujung panah dan tepi lingkaran
+                const meta = chart.getDatasetMeta(0); // Dapatkan metadata dataset
+
+                // Guard clause jika metadata belum siap
+                if (!meta.data || meta.data.length === 0) {
+                    return;
+                }
 
                 ctx.save();
 
                 chartData.edges.forEach(edge => {
-                    const sourceNode = chartData.nodes[edge.source];
-                    const targetNode = chartData.nodes[edge.target];
+                    const sourceElement = meta.data[edge.source];
+                    const targetElement = meta.data[edge.target];
+
+                    // Dapatkan posisi aktual dari elemen yang sudah di-render oleh Chart.js
+                    const sourceNode = { x: sourceElement.x, y: sourceElement.y };
+                    const targetNode = { x: targetElement.x, y: targetElement.y };
+
+                    // Dapatkan radius dan border aktual dari elemen
+                    const sourceRadius = sourceElement.options.radius;
+                    const targetRadius = targetElement.options.radius;
+                    const borderWidth = sourceElement.options.borderWidth;
+
+                    // Kalkulasi total radius (radius + setengah border)
+                    const totalSourceRadius = sourceRadius + (borderWidth / 2);
+                    const totalTargetRadius = targetRadius + (borderWidth / 2);
 
                     const angle = Math.atan2(targetNode.y - sourceNode.y, targetNode.x - sourceNode.x);
 
                     // Titik mulai di tepi lingkaran source node
-                    const startX = sourceNode.x + totalRadius * Math.cos(angle);
-                    const startY = sourceNode.y + totalRadius * Math.sin(angle);
+                    const startX = sourceNode.x + totalSourceRadius * Math.cos(angle);
+                    const startY = sourceNode.y + totalSourceRadius * Math.sin(angle);
 
-                    // Titik akhir di tepi lingkaran target node
-                    const targetX = targetNode.x - (totalRadius + padding) * Math.cos(angle);
-                    const targetY = targetNode.y - (totalRadius + padding) * Math.sin(angle);
+                    // Titik akhir di tepi lingkaran target node (dengan sedikit padding)
+                    const padding = 2;
+                    const targetX = targetNode.x - (totalTargetRadius + padding) * Math.cos(angle);
+                    const targetY = targetNode.y - (totalTargetRadius + padding) * Math.sin(angle);
 
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
