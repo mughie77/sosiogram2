@@ -1,71 +1,97 @@
 /*
  * File: assets/css/style.css
- * Deskripsi: Kustomisasi CSS untuk aplikasi bimbingan konseling.
- * Palet Warna (Contoh):
- * - Primary: #0d6efd (Bootstrap Blue)
- * - Secondary: #6c757d (Bootstrap Gray)
- * - Light: #f8f9fa (Bootstrap Light)
- * - Dark: #212529 (Bootstrap Dark)
- * - Accent: #6f42c1 (misal, ungu lembut untuk sentuhan mewah)
+ * Deskripsi: Overhaul Tampilan Aplikasi Bimbingan Konseling
+ * Tema: Sidebar Gelap Profesional
  */
 
-body {
-    background-color: #f8f9fa; /* Latar belakang abu-abu sangat terang */
-    font-family: 'Poppins', sans-serif; /* Contoh penggunaan font yang lebih modern */
+/* --- Import Font --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- Variabel & Tema Global --- */
+:root {
+    --app-sidebar-bg: #1a202c; /* Dark Slate Gray */
+    --app-sidebar-text: #a0aec0; /* Light Gray */
+    --app-sidebar-hover-bg: #2d3748; /* Darker Slate */
+    --app-sidebar-hover-text: #ffffff;
+    --app-accent-color: #00acc1; /* Cyan */
+    --app-content-bg: #f7fafc; /* Very Light Gray */
+    --app-text-color: #2d3748;
+    --app-border-color: #e2e8f0;
 }
 
-/* --- Variables & Theme --- */
-:root {
-    --bs-primary-rgb: 13, 110, 253;
-    --app-accent-color: #6f42c1; /* Ungu lembut untuk sentuhan mewah */
-    --app-accent-rgb: 111, 66, 193;
+body {
+    background-color: var(--app-content-bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--app-text-color);
+}
+
+/* --- Layout Wrapper --- */
+#wrapper {
+    display: flex;
 }
 
 /* --- Sidebar Styling --- */
-#wrapper {
-    display: flex;
-    overflow-x: hidden;
-}
-
 #sidebar-wrapper {
+    background-color: var(--app-sidebar-bg);
     min-height: 100vh;
-    margin-left: -15rem;
+    width: 250px; /* Lebar sidebar sedikit lebih besar */
+    margin-left: -250px;
     transition: margin 0.25s ease-out;
-    width: 15rem;
-    border-right: 1px solid #dee2e6;
-}
-
-#sidebar-wrapper .list-group-item {
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    border-left: 4px solid transparent;
-}
-
-#sidebar-wrapper .list-group-item.active {
-    background-color: rgba(var(--app-accent-rgb), 0.1);
-    color: var(--app-accent-color);
-    font-weight: 600;
-    border-left: 4px solid var(--app-accent-color);
-}
-
-#sidebar-wrapper .list-group-item:not(.active):hover {
-    background-color: #f0f2f5;
 }
 
 #sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
+    padding: 1.25rem 1.5rem;
     font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
+    font-weight: 700;
+    color: #ffffff;
+    border-bottom: 1px solid var(--app-sidebar-hover-bg);
 }
 
-#sidebar-wrapper .list-group {
-    width: 15rem;
+#sidebar-wrapper .list-group-item {
+    background-color: transparent;
+    color: var(--app-sidebar-text);
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 5px solid transparent;
 }
 
+#sidebar-wrapper .list-group-item i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    background-color: var(--app-sidebar-hover-bg);
+    color: var(--app-sidebar-hover-text);
+}
+
+#sidebar-wrapper .list-group-item.active {
+    background-color: var(--app-sidebar-hover-bg);
+    color: #ffffff;
+    font-weight: 600;
+    border-left: 5px solid var(--app-accent-color);
+}
+
+/* --- Page Content Styling --- */
 #page-content-wrapper {
-    min-width: 100vw;
+    width: 100%;
+    min-width: 0;
 }
 
+#sidebarToggle {
+    border-radius: 0.5rem;
+    background-color: var(--app-accent-color);
+    border-color: var(--app-accent-color);
+}
+#sidebarToggle:hover {
+    opacity: 0.9;
+}
+
+/* --- Toggle States --- */
 body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     margin-left: 0;
 }
@@ -74,91 +100,33 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     #sidebar-wrapper {
         margin-left: 0;
     }
-
     #page-content-wrapper {
-        min-width: 0;
         width: 100%;
     }
-
     body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
-        margin-left: -15rem;
+        margin-left: -250px;
     }
-}
-
-/* Tombol sidebar toggle */
-#sidebarToggle {
-    border-radius: 0.5rem;
-}
-
-/* --- Landing Page Styling --- */
-.landing-header {
-    background: linear-gradient(45deg, rgba(13, 110, 253, 0.7), rgba(111, 66, 193, 0.7)), url('../images/landing-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 8rem 0;
-    text-align: center;
-}
-
-.landing-header h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-}
-
-.landing-header p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.feature-icon {
-    font-size: 3rem;
-    color: #0d6efd;
-}
-
-/* --- Login Page Styling --- */
-.login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-}
-
-.login-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 2rem;
-    border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.login-card .form-control {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-}
-
-.login-card .btn {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
 }
 
 /* --- General Component Styling --- */
 .card {
-    border: none;
+    border: 1px solid var(--app-border-color);
     border-radius: 0.75rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    background-color: #ffffff;
 }
 
 .card-header {
-    font-weight: 600;
     background-color: #ffffff;
-    border-bottom: 1px solid #dee2e6;
-    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--app-border-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
 }
 
 .btn {
+    border-radius: 0.5rem;
+    font-weight: 600;
     transition: all 0.2s ease-in-out;
 }
 
@@ -169,7 +137,18 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
 }
 
 .btn-accent:hover {
-    background-color: #5a359a; /* A slightly darker shade for hover */
-    border-color: #5a359a;
+    opacity: 0.85;
     color: #fff;
+}
+
+.table {
+    border-color: var(--app-border-color);
+}
+
+/* --- Login Page Styling --- */
+.login-container {
+    background-color: #e2e8f0;
+}
+.login-card {
+    border-radius: 0.75rem;
 }

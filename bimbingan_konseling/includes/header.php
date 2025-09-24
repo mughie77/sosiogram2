@@ -56,6 +56,17 @@ function is_active($path, $current_page_url, $base_path) {
 </head>
 <body>
 
+<div style='background: #fff3cd; color: #664d03; padding: 15px; border: 1px solid #ffc107; z-index: 9999; position: relative; margin: 10px; border-radius: 5px;'>
+    <h5 style='margin-top:0; color: #664d03;'>DEBUGGING INFO (Panel ini bisa dihapus nanti)</h5>
+    <pre style='white-space: pre-wrap; word-wrap: break-word; font-size: 14px; margin: 0;'>
+DOCUMENT_ROOT: <?php echo htmlspecialchars($_SERVER['DOCUMENT_ROOT']); ?><br>
+__DIR__:         <?php echo htmlspecialchars(__DIR__); ?><br>
+Calculated \$base_path: <?php echo htmlspecialchars($base_path); ?><br>
+Current Page URL: <?php echo htmlspecialchars($current_page_url); ?><br>
+CSS Path:      &lt;link rel="stylesheet" href="<?php echo htmlspecialchars($base_path . '/assets/css/style.css?v=' . time()); ?>"&gt;
+    </pre>
+</div>
+
 <div class="d-flex" id="wrapper">
     <!-- Sidebar -->
     <div class="bg-white border-end" id="sidebar-wrapper">
