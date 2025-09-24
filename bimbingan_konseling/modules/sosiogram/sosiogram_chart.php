@@ -94,23 +94,45 @@ if (isset($_GET['kelas']) && !empty($_GET['kelas'])) {
 
 <!-- Area Chart -->
 <?php if (!empty($selected_kelas) && !empty(json_decode($chart_data_json, true)['nodes'])): ?>
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>
-            <i class="bi bi-diagram-3-fill me-1"></i>
-            Hasil Sosiogram untuk Kelas: <strong><?php echo htmlspecialchars($selected_kelas); ?></strong>
-        </span>
-        <div class="btn-group">
-            <button id="fullscreenChart" class="btn btn-secondary btn-sm">
-                <i class="bi bi-arrows-fullscreen me-1"></i> Layar Penuh
-            </button>
-            <button id="downloadChart" class="btn btn-success btn-sm">
-                <i class="bi bi-download me-1"></i> Unduh PNG
-            </button>
+<div id="sociogramContainer">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                <i class="bi bi-diagram-3-fill me-1"></i>
+                Hasil Sosiogram untuk Kelas: <strong><?php echo htmlspecialchars($selected_kelas); ?></strong>
+            </span>
+            <div class="btn-group">
+                <button id="fullscreenChart" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrows-fullscreen me-1"></i> Layar Penuh
+                </button>
+                <button id="downloadChart" class="btn btn-success btn-sm">
+                    <i class="bi bi-download me-1"></i> Unduh PNG
+                </button>
+            </div>
+        </div>
+        <div class="card-body text-center" id="chartCanvasContainer" style="background-color: #fff;">
+            <canvas id="sociogramChart" style="max-width: 800px; max-height: 800px; margin: auto;"></canvas>
         </div>
     </div>
-    <div class="card-body text-center" id="chartContainer" style="background-color: #fff;">
-        <canvas id="sociogramChart" style="max-width: 800px; max-height: 800px; margin: auto;"></canvas>
+
+    <!-- Legenda Keterangan Nama -->
+    <div class="card shadow-sm mt-4" id="chartLegend">
+        <div class="card-header">
+            <i class="bi bi-key-fill me-1"></i>
+            Keterangan Nama
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled" style="column-count: 3; column-gap: 20px;">
+                <?php
+                $nodes_for_legend = json_decode($chart_data_json, true)['nodes'];
+                foreach ($nodes_for_legend as $node) {
+                    $name_parts = explode(' ', $node['label']);
+                    $initials = (count($name_parts) > 1) ? strtoupper($name_parts[0][0] . $name_parts[1][0]) : strtoupper(substr($node['label'], 0, 2));
+                    echo '<li><strong>' . htmlspecialchars($initials) . ':</strong> ' . htmlspecialchars($node['label']) . '</li>';
+                }
+                ?>
+            </ul>
+        </div>
     </div>
 </div>
 <?php elseif (!empty($selected_kelas)): ?>
@@ -121,84 +143,61 @@ if (isset($_GET['kelas']) && !empty($_GET['kelas'])) {
 
 
 <script>
-// Pastikan Chart.js sudah dimuat dari footer.php
+// Pastikan Chart.js dan html2canvas.js sudah dimuat dari footer.php
 
 document.addEventListener('DOMContentLoaded', function() {
     const chartData = <?php echo $chart_data_json; ?>;
     const canvas = document.getElementById('sociogramChart');
 
     if (canvas && chartData.nodes && chartData.nodes.length > 0) {
+        // ... (logika chart yang sama seperti sebelumnya, tidak perlu diubah) ...
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
-        const radius = Math.min(width, height) * 0.38; // Sedikit lebih kecil untuk padding
+        const radius = Math.min(width, height) * 0.38;
         const center = { x: width / 2, y: height / 2 };
         const nodeCount = chartData.nodes.length;
-        const pointRadius = 15; // Definisikan radius titik di sini
+        const pointRadius = 15;
 
-        // Hitung posisi node dalam lingkaran
         chartData.nodes.forEach((node, i) => {
-            const angle = (i / nodeCount) * 2 * Math.PI - (Math.PI / 2); // Mulai dari atas
+            const angle = (i / nodeCount) * 2 * Math.PI - (Math.PI / 2);
             node.x = center.x + radius * Math.cos(angle);
             node.y = center.y + radius * Math.sin(angle);
         });
 
-        // Plugin untuk menggambar garis (edges) di belakang titik (nodes)
         const backgroundPlugin = {
             id: 'backgroundPlugin',
             beforeDraw: (chart) => {
                 const ctx = chart.ctx;
-                const meta = chart.getDatasetMeta(0); // Dapatkan metadata dataset
-
-                // Guard clause jika metadata belum siap
-                if (!meta.data || meta.data.length === 0) {
-                    return;
-                }
-
+                const meta = chart.getDatasetMeta(0);
+                if (!meta.data || meta.data.length === 0) return;
                 ctx.save();
-
                 chartData.edges.forEach(edge => {
                     const sourceElement = meta.data[edge.source];
                     const targetElement = meta.data[edge.target];
-
-                    // Dapatkan posisi aktual dari elemen yang sudah di-render oleh Chart.js
                     const sourceNode = { x: sourceElement.x, y: sourceElement.y };
                     const targetNode = { x: targetElement.x, y: targetElement.y };
-
-                    // Dapatkan radius dan border aktual dari elemen
                     const sourceRadius = sourceElement.options.radius;
                     const targetRadius = targetElement.options.radius;
                     const borderWidth = sourceElement.options.borderWidth;
-
-                    // Kalkulasi total radius (radius + setengah border)
                     const totalSourceRadius = sourceRadius + (borderWidth / 2);
                     const totalTargetRadius = targetRadius + (borderWidth / 2);
-
                     const angle = Math.atan2(targetNode.y - sourceNode.y, targetNode.x - sourceNode.x);
-
-                    // Titik mulai di tepi lingkaran source node
                     const startX = sourceNode.x + totalSourceRadius * Math.cos(angle);
                     const startY = sourceNode.y + totalSourceRadius * Math.sin(angle);
-
-                    // Titik akhir di tepi lingkaran target node (dengan sedikit padding)
                     const padding = 2;
                     const targetX = targetNode.x - (totalTargetRadius + padding) * Math.cos(angle);
                     const targetY = targetNode.y - (totalTargetRadius + padding) * Math.sin(angle);
-
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
                     ctx.lineTo(targetX, targetY);
-
                     ctx.lineWidth = 1.5;
                     ctx.strokeStyle = (edge.status === 'positif') ? 'rgba(25, 135, 84, 0.7)' : 'rgba(220, 53, 69, 0.7)';
-
-                    // Gambar panah di titik akhir yang baru
                     const arrowLength = 10;
                     ctx.moveTo(targetX, targetY);
                     ctx.lineTo(targetX - arrowLength * Math.cos(angle - Math.PI / 6), targetY - arrowLength * Math.sin(angle - Math.PI / 6));
                     ctx.moveTo(targetX, targetY);
                     ctx.lineTo(targetX - arrowLength * Math.cos(angle + Math.PI / 6), targetY - arrowLength * Math.sin(angle + Math.PI / 6));
-
                     ctx.stroke();
                 });
                 ctx.restore();
@@ -221,27 +220,16 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                },
+                scales: { x: { display: false }, y: { display: false } },
                 plugins: {
                     legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ' ' + context.raw.label;
-                            }
-                        }
-                    },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + context.raw.label; } } },
                     datalabels: {
                         color: '#fff',
                         font: { weight: 'bold' },
                         formatter: function(value, context) {
                             const nameParts = value.label.split(' ');
-                            if (nameParts.length > 1) {
-                                return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
-                            }
+                            if (nameParts.length > 1) { return (nameParts[0][0] + nameParts[1][0]).toUpperCase(); }
                             return value.label.substring(0, 2).toUpperCase();
                         }
                     }
@@ -250,38 +238,30 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: [backgroundPlugin, ChartDataLabels]
         });
 
-        // --- FUNGSI BARU: Fullscreen & Download ---
+
+        // --- FUNGSI BARU: Fullscreen & Download dengan Legenda ---
         const downloadBtn = document.getElementById('downloadChart');
         const fullscreenBtn = document.getElementById('fullscreenChart');
-        const chartContainer = document.getElementById('chartContainer');
+        const sociogramContainer = document.getElementById('sociogramContainer'); // Kontainer utama untuk di-download
 
-        if(downloadBtn) {
+        if(downloadBtn && sociogramContainer) {
             downloadBtn.addEventListener('click', function() {
-                // Simpan state chart asli
-                const originalBg = chartContainer.style.backgroundColor;
-                // Set background putih untuk diunduh
-                chartContainer.style.backgroundColor = '#ffffff';
-                // Re-render chart dengan background baru (meski tidak terlihat langsung, ini mempengaruhi toDataURL)
-                sociogramChart.update();
-
-                // Beri sedikit waktu untuk render sebelum download
-                setTimeout(() => {
+                html2canvas(sociogramContainer, {
+                    backgroundColor: '#ffffff', // Set background putih
+                    scale: 2 // Tingkatkan resolusi untuk kualitas lebih baik
+                }).then(canvas => {
                     const link = document.createElement('a');
-                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.href = canvas.toDataURL('image/png');
                     link.download = `sosiogram-kelas-<?php echo htmlspecialchars($selected_kelas); ?>.png`;
                     link.click();
-
-                    // Kembalikan background setelah download
-                    chartContainer.style.backgroundColor = originalBg;
-                    sociogramChart.update();
-                }, 100);
+                });
             });
         }
 
-        if(fullscreenBtn && chartContainer) {
+        if(fullscreenBtn && sociogramContainer) {
             fullscreenBtn.addEventListener('click', function() {
                 if (!document.fullscreenElement) {
-                    chartContainer.requestFullscreen().catch(err => {
+                    sociogramContainer.requestFullscreen().catch(err => {
                         alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
                     });
                 } else {
