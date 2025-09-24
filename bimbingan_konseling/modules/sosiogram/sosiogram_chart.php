@@ -95,16 +95,21 @@ if (isset($_GET['kelas']) && !empty($_GET['kelas'])) {
 <!-- Area Chart -->
 <?php if (!empty($selected_kelas) && !empty(json_decode($chart_data_json, true)['nodes'])): ?>
 <div class="card shadow-sm">
-    <div class="card-header">
-        <i class="bi bi-diagram-3-fill me-1"></i>
-        Hasil Sosiogram untuk Kelas: <strong><?php echo htmlspecialchars($selected_kelas); ?></strong>
-        <div class="float-end">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>
+            <i class="bi bi-diagram-3-fill me-1"></i>
+            Hasil Sosiogram untuk Kelas: <strong><?php echo htmlspecialchars($selected_kelas); ?></strong>
+        </span>
+        <div class="btn-group">
+            <button id="fullscreenChart" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrows-fullscreen me-1"></i> Layar Penuh
+            </button>
             <button id="downloadChart" class="btn btn-success btn-sm">
-                <i class="bi bi-download me-1"></i> Unduh sebagai PNG
+                <i class="bi bi-download me-1"></i> Unduh PNG
             </button>
         </div>
     </div>
-    <div class="card-body text-center">
+    <div class="card-body text-center" id="chartContainer" style="background-color: #fff;">
         <canvas id="sociogramChart" style="max-width: 800px; max-height: 800px; margin: auto;"></canvas>
     </div>
 </div>
@@ -126,9 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
-        const radius = Math.min(width, height) * 0.4;
+        const radius = Math.min(width, height) * 0.38; // Sedikit lebih kecil untuk padding
         const center = { x: width / 2, y: height / 2 };
         const nodeCount = chartData.nodes.length;
+        const pointRadius = 15; // Definisikan radius titik di sini
 
         // Hitung posisi node dalam lingkaran
         chartData.nodes.forEach((node, i) => {
@@ -148,19 +154,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     const sourceNode = chartData.nodes[edge.source];
                     const targetNode = chartData.nodes[edge.target];
 
+                    const angle = Math.atan2(targetNode.y - sourceNode.y, targetNode.x - sourceNode.x);
+
+                    // Titik mulai di tepi lingkaran source node
+                    const startX = sourceNode.x + (pointRadius + 2) * Math.cos(angle);
+                    const startY = sourceNode.y + (pointRadius + 2) * Math.sin(angle);
+
+                    // Titik akhir di tepi lingkaran target node
+                    const targetX = targetNode.x - (pointRadius + 2) * Math.cos(angle);
+                    const targetY = targetNode.y - (pointRadius + 2) * Math.sin(angle);
+
                     ctx.beginPath();
-                    ctx.moveTo(sourceNode.x, sourceNode.y);
-                    ctx.lineTo(targetNode.x, targetNode.y);
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(targetX, targetY);
 
                     ctx.lineWidth = 1.5;
-                    ctx.strokeStyle = (edge.status === 'positif') ? 'rgba(25, 135, 84, 0.6)' : 'rgba(220, 53, 69, 0.6)';
+                    ctx.strokeStyle = (edge.status === 'positif') ? 'rgba(25, 135, 84, 0.7)' : 'rgba(220, 53, 69, 0.7)';
 
-                    // Gambar panah
-                    const angle = Math.atan2(targetNode.y - sourceNode.y, targetNode.x - sourceNode.x);
+                    // Gambar panah di titik akhir yang baru
                     const arrowLength = 10;
-                    ctx.lineTo(targetNode.x - arrowLength * Math.cos(angle - Math.PI / 6), targetNode.y - arrowLength * Math.sin(angle - Math.PI / 6));
-                    ctx.moveTo(targetNode.x, targetNode.y);
-                    ctx.lineTo(targetNode.x - arrowLength * Math.cos(angle + Math.PI / 6), targetNode.y - arrowLength * Math.sin(angle + Math.PI / 6));
+                    ctx.moveTo(targetX, targetY);
+                    ctx.lineTo(targetX - arrowLength * Math.cos(angle - Math.PI / 6), targetY - arrowLength * Math.sin(angle - Math.PI / 6));
+                    ctx.moveTo(targetX, targetY);
+                    ctx.lineTo(targetX - arrowLength * Math.cos(angle + Math.PI / 6), targetY - arrowLength * Math.sin(angle + Math.PI / 6));
 
                     ctx.stroke();
                 });
@@ -168,15 +184,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
-        new Chart(ctx, {
+        const sociogramChart = new Chart(ctx, {
             type: 'scatter',
             data: {
                 datasets: [{
                     label: 'Siswa',
                     data: chartData.nodes,
-                    pointRadius: 15,
+                    pointRadius: pointRadius,
                     pointHoverRadius: 20,
-                    pointBackgroundColor: chartData.nodes.map(n => n.gender === 'L' ? 'rgba(54, 162, 235, 0.8)' : 'rgba(255, 99, 132, 0.8)'), // Biru untuk L, Pink untuk P
+                    pointBackgroundColor: chartData.nodes.map(n => n.gender === 'L' ? 'rgba(54, 162, 235, 0.9)' : 'rgba(255, 99, 132, 0.9)'),
                     pointBorderColor: chartData.nodes.map(n => n.gender === 'L' ? 'rgb(54, 162, 235)' : 'rgb(255, 99, 132)'),
                     pointBorderWidth: 2,
                 }]
@@ -193,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.raw.label;
+                                return ' ' + context.raw.label;
                             }
                         }
                     },
@@ -201,12 +217,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         color: '#fff',
                         font: { weight: 'bold' },
                         formatter: function(value, context) {
-                            // Tampilkan inisial nama
                             const nameParts = value.label.split(' ');
                             if (nameParts.length > 1) {
-                                return nameParts[0][0] + nameParts[1][0];
+                                return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
                             }
-                            return value.label.substring(0, 2);
+                            return value.label.substring(0, 2).toUpperCase();
                         }
                     }
                 }
@@ -214,14 +229,43 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: [backgroundPlugin, ChartDataLabels]
         });
 
-        // Fungsi download
+        // --- FUNGSI BARU: Fullscreen & Download ---
         const downloadBtn = document.getElementById('downloadChart');
+        const fullscreenBtn = document.getElementById('fullscreenChart');
+        const chartContainer = document.getElementById('chartContainer');
+
         if(downloadBtn) {
             downloadBtn.addEventListener('click', function() {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.download = `sosiogram-kelas-<?php echo htmlspecialchars($selected_kelas); ?>.png`;
-                link.click();
+                // Simpan state chart asli
+                const originalBg = chartContainer.style.backgroundColor;
+                // Set background putih untuk diunduh
+                chartContainer.style.backgroundColor = '#ffffff';
+                // Re-render chart dengan background baru (meski tidak terlihat langsung, ini mempengaruhi toDataURL)
+                sociogramChart.update();
+
+                // Beri sedikit waktu untuk render sebelum download
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.download = `sosiogram-kelas-<?php echo htmlspecialchars($selected_kelas); ?>.png`;
+                    link.click();
+
+                    // Kembalikan background setelah download
+                    chartContainer.style.backgroundColor = originalBg;
+                    sociogramChart.update();
+                }, 100);
+            });
+        }
+
+        if(fullscreenBtn && chartContainer) {
+            fullscreenBtn.addEventListener('click', function() {
+                if (!document.fullscreenElement) {
+                    chartContainer.requestFullscreen().catch(err => {
+                        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
             });
         }
     }
