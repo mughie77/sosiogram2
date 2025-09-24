@@ -21,9 +21,46 @@ if (isset($_GET['status'])) {
 }
 
 
-// Ambil semua data siswa dari database
-$query = "SELECT id, nis, nama_lengkap, kelas, jenis_kelamin FROM siswa ORDER BY kelas, nama_lengkap ASC";
-$result = mysqli_query($koneksi, $query);
+// --- Logika untuk Filter dan Pencarian ---
+
+// Ambil daftar kelas unik untuk dropdown filter
+$query_kelas = "SELECT DISTINCT kelas FROM siswa ORDER BY kelas ASC";
+$result_kelas = mysqli_query($koneksi, $query_kelas);
+
+// Inisialisasi variabel filter
+$filter_kelas = isset($_GET['kelas']) ? $_GET['kelas'] : '';
+$search_query = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Bangun query dasar
+$query = "SELECT id, nis, nama_lengkap, kelas, jenis_kelamin FROM siswa WHERE 1=1";
+$params = [];
+$types = '';
+
+// Tambahkan kondisi filter kelas jika ada
+if (!empty($filter_kelas)) {
+    $query .= " AND kelas = ?";
+    $params[] = $filter_kelas;
+    $types .= 's';
+}
+
+// Tambahkan kondisi pencarian jika ada
+if (!empty($search_query)) {
+    $query .= " AND (nama_lengkap LIKE ? OR nis LIKE ?)";
+    $search_param = "%" . $search_query . "%";
+    $params[] = $search_param;
+    $params[] = $search_param;
+    $types .= 'ss';
+}
+
+$query .= " ORDER BY kelas, nama_lengkap ASC";
+
+// Gunakan prepared statement untuk keamanan
+$stmt = mysqli_prepare($koneksi, $query);
+if (!empty($params)) {
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+}
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 ?>
 
@@ -31,6 +68,37 @@ $result = mysqli_query($koneksi, $query);
 <p class="lead">Kelola data siswa yang terdaftar dalam sistem.</p>
 
 <?php echo $message; // Tampilkan pesan notifikasi ?>
+
+<!-- Form Filter dan Pencarian -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <i class="bi bi-funnel-fill me-1"></i>
+        Filter & Pencarian
+    </div>
+    <div class="card-body">
+        <form action="daftar_siswa" method="GET" class="row g-3">
+            <div class="col-md-5">
+                <label for="search" class="form-label">Cari Nama / NIS</label>
+                <input type="text" class="form-control" id="search" name="search" placeholder="Masukkan nama atau NIS..." value="<?php echo htmlspecialchars($search_query); ?>">
+            </div>
+            <div class="col-md-5">
+                <label for="kelas" class="form-label">Filter per Kelas</label>
+                <select class="form-select" id="kelas" name="kelas">
+                    <option value="">-- Semua Kelas --</option>
+                    <?php while($row_kelas = mysqli_fetch_assoc($result_kelas)): ?>
+                        <option value="<?php echo htmlspecialchars($row_kelas['kelas']); ?>" <?php echo ($filter_kelas === $row_kelas['kelas']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($row_kelas['kelas']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2 w-100">Cari</button>
+                <a href="daftar_siswa" class="btn btn-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header">
