@@ -2,38 +2,22 @@
 // Memulai session di awal
 session_start();
 
-// --- Pengaturan URL Absolut Dinamis (Versi Final & Lengkap) ---
-
-// 1. Tentukan protokol (http atau https)
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-
-// 2. Tentukan nama domain dan hapus titik di akhir jika ada (untuk mengatasi error SNI)
-$domain = rtrim($_SERVER['HTTP_HOST'], '.');
-
-// 3. Hitung base path dari root folder proyek
-$doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
-$dir_name = str_replace('\\', '/', __DIR__);
-$base_path = str_replace($doc_root, '', $dir_name);
-$base_path = dirname($base_path);
-if ($base_path === '/' || $base_path === '\\') {
-    $base_path = '';
-}
-
-// 4. Gabungkan menjadi URL dasar yang absolut
-$base_url = $protocol . $domain . $base_path;
+// --- Pengaturan URL Absolut (Hardcoded Sesuai Permintaan) ---
+$base_url = "https://bk.smkn2bondowoso.sch.id/";
 
 
 // Cek apakah pengguna sudah login dan memiliki role admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ' . $base_url . '/login');
+    header('Location: ' . $base_url . 'login');
     exit;
 }
 
 // --- Logika untuk Menu Aktif ---
-$current_page_url = $protocol . $domain . $_SERVER['REQUEST_URI'];
+$current_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-function is_active($page_url, $current_page_url) {
-    if (strpos($current_page_url, $page_url) !== false) {
+function is_active($path_segment, $current_path) {
+    // Cek jika segmen path ada di dalam path URL saat ini.
+    if (strpos($current_path, $path_segment) !== false) {
         return 'active';
     }
     return '';
@@ -53,7 +37,7 @@ function is_active($page_url, $current_page_url) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Custom CSS with Cache Busting -->
-    <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/style.css?v=<?php echo time(); ?>">
 
     <title>Dashboard - Aplikasi Bimbingan Konseling</title>
 </head>
@@ -66,19 +50,19 @@ function is_active($page_url, $current_page_url) {
             <i class="bi bi-person-circle me-2"></i> Aplikasi BK
         </div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/dashboard', $current_page_url); ?>" href="<?php echo $base_url; ?>/dashboard">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/dashboard', $current_path); ?>" href="<?php echo $base_url; ?>dashboard">
                 <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/siswa', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/siswa/daftar_siswa">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/siswa', $current_path); ?>" href="<?php echo $base_url; ?>modules/siswa/daftar_siswa">
                 <i class="bi bi-people-fill me-2"></i> Data Siswa
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/sosiogram/data_pertemanan', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/sosiogram/data_pertemanan">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/data_pertemanan', $current_path); ?>" href="<?php echo $base_url; ?>modules/sosiogram/data_pertemanan">
                 <i class="bi bi-diagram-3-fill me-2"></i> Data Pertemanan
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/sosiogram/sosiogram_chart', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/sosiogram/sosiogram_chart">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/sosiogram_chart', $current_path); ?>" href="<?php echo $base_url; ?>modules/sosiogram/sosiogram_chart">
                 <i class="bi bi-bar-chart-line-fill me-2"></i> Sosiogram
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_url; ?>/logout">
+            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_url; ?>logout">
                 <i class="bi bi-box-arrow-right me-2"></i> Keluar
             </a>
         </div>
