@@ -2,40 +2,38 @@
 // Memulai session di awal
 session_start();
 
-// --- Pengaturan Path Dinamis (Versi Final) ---
-// Menyamakan format pemisah direktori untuk kalkulasi yang andal di semua OS.
+// --- Pengaturan URL Absolut Dinamis ---
+
+// 1. Tentukan protokol (http atau https)
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+// 2. Tentukan nama domain
+$domain = $_SERVER['HTTP_HOST'];
+
+// 3. Hitung base path dari root folder proyek
 $doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
 $dir_name = str_replace('\\', '/', __DIR__);
-
-// Menghitung path URL relatif dari document root.
-$base_path = str_replace($doc_root, '', $dir_name); // Hasil: /folder_proyek/includes
-$base_path = dirname($base_path); // Hasil: /folder_proyek
-
-// Menangani kasus jika proyek ada di root direktori web.
+$base_path = str_replace($doc_root, '', $dir_name);
+$base_path = dirname($base_path);
 if ($base_path === '/' || $base_path === '\\') {
-    $base_path = ''; // Jadikan string kosong agar tidak ada slash ganda di URL.
+    $base_path = '';
 }
+
+// 4. Gabungkan menjadi URL dasar yang absolut
+$base_url = $protocol . $domain . $base_path;
 
 
 // Cek apakah pengguna sudah login dan memiliki role admin
-// Jika tidak, redirect ke halaman login
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // Menggunakan base_path dinamis untuk redirect yang andal
-    header('Location: ' . $base_path . '/login');
+    header('Location: ' . $base_url . '/login');
     exit;
 }
 
 // --- Logika untuk Menu Aktif ---
-$current_page_url = $_SERVER['REQUEST_URI']; // Gunakan REQUEST_URI untuk URL bersih
+$current_page_url = $protocol . $domain . $_SERVER['REQUEST_URI'];
 
-function is_active($path, $current_page_url, $base_path) {
-    // Cek jika path yang diberikan ada di dalam URL halaman saat ini.
-    $url_to_check = $base_path . $path;
-    if (strpos($current_page_url, $url_to_check) !== false) {
-        return 'active';
-    }
-    // Khusus untuk dashboard, cek path yang sama persis
-    if ($path === '/dashboard' && $current_page_url === $base_path . '/dashboard') {
+function is_active($page_url, $current_page_url) {
+    if (strpos($current_page_url, $page_url) !== false) {
         return 'active';
     }
     return '';
@@ -55,7 +53,7 @@ function is_active($path, $current_page_url, $base_path) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Custom CSS with Cache Busting -->
-    <link rel="stylesheet" href="<?php echo $base_path; ?>/assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/style.css?v=<?php echo time(); ?>">
 
     <title>Dashboard - Aplikasi Bimbingan Konseling</title>
 </head>
@@ -68,19 +66,19 @@ function is_active($path, $current_page_url, $base_path) {
             <i class="bi bi-person-circle me-2"></i> Aplikasi BK
         </div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/dashboard', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/dashboard">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/dashboard', $current_page_url); ?>" href="<?php echo $base_url; ?>/dashboard">
                 <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/siswa', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/siswa/daftar_siswa">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/siswa', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/siswa/daftar_siswa">
                 <i class="bi bi-people-fill me-2"></i> Data Siswa
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/data_pertemanan', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/sosiogram/data_pertemanan">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/sosiogram/data_pertemanan', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/sosiogram/data_pertemanan">
                 <i class="bi bi-diagram-3-fill me-2"></i> Data Pertemanan
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/sosiogram_chart', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/sosiogram/sosiogram_chart">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active($base_url . '/modules/sosiogram/sosiogram_chart', $current_page_url); ?>" href="<?php echo $base_url; ?>/modules/sosiogram/sosiogram_chart">
                 <i class="bi bi-bar-chart-line-fill me-2"></i> Sosiogram
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_path; ?>/logout">
+            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_url; ?>/logout">
                 <i class="bi bi-box-arrow-right me-2"></i> Keluar
             </a>
         </div>

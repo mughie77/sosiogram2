@@ -18,7 +18,7 @@
 
 
 <!-- Custom JS with Cache Busting -->
-<script src="<?php echo $base_path; ?>/assets/js/script.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $base_url; ?>/assets/js/script.js?v=<?php echo time(); ?>"></script>
 
 <script>
 // Script untuk toggle sidebar
