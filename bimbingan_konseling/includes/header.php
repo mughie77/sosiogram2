@@ -1,16 +1,27 @@
 <?php
+<?php
 // Memulai session di awal
 session_start();
 
 // Cek apakah pengguna sudah login dan memiliki role admin
 // Jika tidak, redirect ke halaman login
+// Catatan: Pengecekan ini mungkin perlu path yang lebih cerdas jika file login tidak selalu di root
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
+    // Untuk file di dalam /modules/, path ke login.php berbeda
+    // Solusi sederhana: gunakan path absolut dari root folder proyek
+    // Solusi lebih baik: Gunakan path yang dinamis atau konstanta terpusat
+    $logout_path = '/bimbingan_konseling/login.php';
+    // Cek jika kita berada di dalam folder modules
+    if (strpos($_SERVER['PHP_SELF'], '/modules/') !== false) {
+        $logout_path = '/bimbingan_konseling/login.php';
+    }
+    header('Location: ' . $logout_path);
     exit;
 }
 
-// Set base URL dinamis
-$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/bimbingan_konseling";
+// Set base path. Ini adalah satu-satunya tempat yang perlu diubah jika aplikasi
+// dijalankan di dalam sub-folder yang berbeda.
+$base_path = "/bimbingan_konseling";
 ?>
 <!doctype html>
 <html lang="id">
@@ -26,7 +37,7 @@ $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/bimbingan_konseling";
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $base_path; ?>/assets/css/style.css">
 
     <title>Dashboard - Aplikasi Bimbingan Konseling</title>
 </head>
@@ -39,19 +50,19 @@ $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/bimbingan_konseling";
             <i class="bi bi-person-circle me-2"></i> Aplikasi BK
         </div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_url; ?>/dashboard.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/dashboard.php">
                 <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_url; ?>/modules/siswa/daftar_siswa.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/siswa/daftar_siswa.php">
                 <i class="bi bi-people-fill me-2"></i> Data Siswa
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_url; ?>/modules/sosiogram/data_pertemanan.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/sosiogram/data_pertemanan.php">
                 <i class="bi bi-diagram-3-fill me-2"></i> Data Pertemanan
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_url; ?>/modules/sosiogram/sosiogram_chart.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/sosiogram/sosiogram_chart.php">
                 <i class="bi bi-bar-chart-line-fill me-2"></i> Sosiogram
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_url; ?>/logout.php">
+            <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_path; ?>/logout.php">
                 <i class="bi bi-box-arrow-right me-2"></i> Keluar
             </a>
         </div>

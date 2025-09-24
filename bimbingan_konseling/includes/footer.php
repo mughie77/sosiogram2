@@ -15,7 +15,7 @@
 
 
 <!-- Custom JS -->
-<script src="<?php echo $base_url; ?>/assets/js/script.js"></script>
+<script src="<?php echo $base_path; ?>/assets/js/script.js"></script>
 
 <script>
 // Script untuk toggle sidebar
