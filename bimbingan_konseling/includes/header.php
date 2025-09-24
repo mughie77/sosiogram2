@@ -7,8 +7,8 @@ session_start();
 // 1. Tentukan protokol (http atau https)
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
-// 2. Tentukan nama domain
-$domain = $_SERVER['HTTP_HOST'];
+// 2. Tentukan nama domain dan hapus titik di akhir jika ada (untuk mengatasi error SNI)
+$domain = rtrim($_SERVER['HTTP_HOST'], '.');
 
 // 3. Hitung base path dari root folder proyek
 $doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
