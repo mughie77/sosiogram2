@@ -1,27 +1,28 @@
 <?php
-<?php
 // Memulai session di awal
 session_start();
 
-// Cek apakah pengguna sudah login dan memiliki role admin
-// Jika tidak, redirect ke halaman login
-// Catatan: Pengecekan ini mungkin perlu path yang lebih cerdas jika file login tidak selalu di root
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // Untuk file di dalam /modules/, path ke login.php berbeda
-    // Solusi sederhana: gunakan path absolut dari root folder proyek
-    // Solusi lebih baik: Gunakan path yang dinamis atau konstanta terpusat
-    $logout_path = '/bimbingan_konseling/login.php';
-    // Cek jika kita berada di dalam folder modules
-    if (strpos($_SERVER['PHP_SELF'], '/modules/') !== false) {
-        $logout_path = '/bimbingan_konseling/login.php';
-    }
-    header('Location: ' . $logout_path);
-    exit;
+// --- Pengaturan Path Dinamis ---
+// Membuat base_path secara dinamis agar tidak perlu diedit manual.
+// Mengambil path dari root dokumen server ke folder 'includes' tempat file ini berada.
+$base_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__);
+// Naik satu level untuk mendapatkan root folder aplikasi.
+$base_path = dirname($base_path);
+// Mengganti backslash (Windows) dengan forward slash (URL).
+$base_path = str_replace('\\', '/', $base_path);
+// Jika aplikasi ada di root folder web, base_path akan menjadi '/'. Untuk konsistensi, kita bisa buat jadi string kosong.
+if ($base_path === '/') {
+    $base_path = '';
 }
 
-// Set base path. Ini adalah satu-satunya tempat yang perlu diubah jika aplikasi
-// dijalankan di dalam sub-folder yang berbeda.
-$base_path = "/bimbingan_konseling";
+
+// Cek apakah pengguna sudah login dan memiliki role admin
+// Jika tidak, redirect ke halaman login
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    // Menggunakan base_path dinamis untuk redirect yang andal
+    header('Location: ' . $base_path . '/login.php');
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="id">
