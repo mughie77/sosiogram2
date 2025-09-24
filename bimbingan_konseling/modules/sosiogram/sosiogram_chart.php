@@ -148,6 +148,12 @@ document.addEventListener('DOMContentLoaded', function() {
             id: 'backgroundPlugin',
             beforeDraw: (chart) => {
                 const ctx = chart.ctx;
+                const dataset = chart.data.datasets[0];
+                const pointRadius = dataset.pointRadius || 15;
+                const borderWidth = dataset.pointBorderWidth || 2;
+                const totalRadius = pointRadius + borderWidth;
+                const padding = 2; // Jarak antara ujung panah dan tepi lingkaran
+
                 ctx.save();
 
                 chartData.edges.forEach(edge => {
@@ -157,12 +163,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const angle = Math.atan2(targetNode.y - sourceNode.y, targetNode.x - sourceNode.x);
 
                     // Titik mulai di tepi lingkaran source node
-                    const startX = sourceNode.x + (pointRadius + 2) * Math.cos(angle);
-                    const startY = sourceNode.y + (pointRadius + 2) * Math.sin(angle);
+                    const startX = sourceNode.x + totalRadius * Math.cos(angle);
+                    const startY = sourceNode.y + totalRadius * Math.sin(angle);
 
                     // Titik akhir di tepi lingkaran target node
-                    const targetX = targetNode.x - (pointRadius + 2) * Math.cos(angle);
-                    const targetY = targetNode.y - (pointRadius + 2) * Math.sin(angle);
+                    const targetX = targetNode.x - (totalRadius + padding) * Math.cos(angle);
+                    const targetY = targetNode.y - (totalRadius + padding) * Math.sin(angle);
 
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
