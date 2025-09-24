@@ -1,0 +1,134 @@
+/*
+ * File: assets/css/style.css
+ * Deskripsi: Kustomisasi CSS untuk aplikasi bimbingan konseling.
+ * Palet Warna (Contoh):
+ * - Primary: #0d6efd (Bootstrap Blue)
+ * - Secondary: #6c757d (Bootstrap Gray)
+ * - Light: #f8f9fa (Bootstrap Light)
+ * - Dark: #212529 (Bootstrap Dark)
+ * - Accent: #6f42c1 (misal, ungu lembut untuk sentuhan mewah)
+ */
+
+body {
+    background-color: #f8f9fa; /* Latar belakang abu-abu sangat terang */
+    font-family: 'Poppins', sans-serif; /* Contoh penggunaan font yang lebih modern */
+}
+
+/* --- Sidebar Styling --- */
+#wrapper {
+    display: flex;
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin 0.25s ease-out;
+    width: 15rem;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+#page-content-wrapper {
+    min-width: 100vw;
+}
+
+body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+    margin-left: 0;
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}
+
+/* Tombol sidebar toggle */
+#sidebarToggle {
+    border-radius: 0.5rem;
+}
+
+/* --- Landing Page Styling --- */
+.landing-header {
+    background: linear-gradient(45deg, rgba(13, 110, 253, 0.7), rgba(111, 66, 193, 0.7)), url('../images/landing-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 8rem 0;
+    text-align: center;
+}
+
+.landing-header h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.landing-header p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: #0d6efd;
+}
+
+/* --- Login Page Styling --- */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-card .form-control {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+}
+
+.login-card .btn {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+/* --- General Component Styling --- */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+.card-header {
+    font-weight: 600;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+}
