@@ -2,17 +2,18 @@
 // Memulai session di awal
 session_start();
 
-// --- Pengaturan Path Dinamis ---
-// Membuat base_path secara dinamis agar tidak perlu diedit manual.
-// Mengambil path dari root dokumen server ke folder 'includes' tempat file ini berada.
-$base_path = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__);
-// Naik satu level untuk mendapatkan root folder aplikasi.
-$base_path = dirname($base_path);
-// Mengganti backslash (Windows) dengan forward slash (URL).
-$base_path = str_replace('\\', '/', $base_path);
-// Jika aplikasi ada di root folder web, base_path akan menjadi '/'. Untuk konsistensi, kita bisa buat jadi string kosong.
-if ($base_path === '/') {
-    $base_path = '';
+// --- Pengaturan Path Dinamis (Versi Final) ---
+// Menyamakan format pemisah direktori untuk kalkulasi yang andal di semua OS.
+$doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+$dir_name = str_replace('\\', '/', __DIR__);
+
+// Menghitung path URL relatif dari document root.
+$base_path = str_replace($doc_root, '', $dir_name); // Hasil: /folder_proyek/includes
+$base_path = dirname($base_path); // Hasil: /folder_proyek
+
+// Menangani kasus jika proyek ada di root direktori web.
+if ($base_path === '/' || $base_path === '\\') {
+    $base_path = ''; // Jadikan string kosong agar tidak ada slash ganda di URL.
 }
 
 
@@ -55,17 +56,6 @@ function is_active($path, $current_page_url, $base_path) {
     <title>Dashboard - Aplikasi Bimbingan Konseling</title>
 </head>
 <body>
-
-<div style='background: #fff3cd; color: #664d03; padding: 15px; border: 1px solid #ffc107; z-index: 9999; position: relative; margin: 10px; border-radius: 5px;'>
-    <h5 style='margin-top:0; color: #664d03;'>DEBUGGING INFO (Panel ini bisa dihapus nanti)</h5>
-    <pre style='white-space: pre-wrap; word-wrap: break-word; font-size: 14px; margin: 0;'>
-DOCUMENT_ROOT: <?php echo htmlspecialchars($_SERVER['DOCUMENT_ROOT']); ?><br>
-__DIR__:         <?php echo htmlspecialchars(__DIR__); ?><br>
-Calculated \$base_path: <?php echo htmlspecialchars($base_path); ?><br>
-Current Page URL: <?php echo htmlspecialchars($current_page_url); ?><br>
-CSS Path:      &lt;link rel="stylesheet" href="<?php echo htmlspecialchars($base_path . '/assets/css/style.css?v=' . time()); ?>"&gt;
-    </pre>
-</div>
 
 <div class="d-flex" id="wrapper">
     <!-- Sidebar -->
