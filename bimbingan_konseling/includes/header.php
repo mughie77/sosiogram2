@@ -2,15 +2,8 @@
 // Memulai session di awal
 session_start();
 
-// --- Pengaturan URL Absolut Dinamis ---
+// --- Pengaturan URL Absolut Dinamis (Versi Final & Lengkap) ---
 
-// --- TEST: Hardcode URL untuk Debugging SNI Error ---
-// Logika dinamis di bawah ini sementara dinonaktifkan.
-// Jika ini berhasil, berarti ada masalah pada cara server melaporkan variabel $_SERVER.
-// Pastikan path folder di bawah ini benar (e.g., /bk2, /bimbingan_konseling, etc.)
-$base_url = "https://bk.smkn2bondowoso.sch.id/bk2";
-
-/*
 // 1. Tentukan protokol (http atau https)
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
@@ -28,7 +21,6 @@ if ($base_path === '/' || $base_path === '\\') {
 
 // 4. Gabungkan menjadi URL dasar yang absolut
 $base_url = $protocol . $domain . $base_path;
-*/
 
 
 // Cek apakah pengguna sudah login dan memiliki role admin
