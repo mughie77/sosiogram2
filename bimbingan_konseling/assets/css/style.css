@@ -145,10 +145,55 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     border-color: var(--app-border-color);
 }
 
-/* --- Login Page Styling --- */
-.login-container {
-    background-color: #e2e8f0;
+/* --- Login Page Styling (V2) --- */
+.login-main-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
 }
+
+.login-form-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #ffffff;
+}
+
+.login-branding-panel {
+    flex: 1;
+    background-color: var(--app-sidebar-bg);
+    color: #ffffff;
+    display: none; /* Hide on small screens */
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .login-branding-panel {
+        display: flex; /* Show on large screens */
+        flex-direction: column;
+    }
+}
+
+.login-branding-panel h2 {
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.login-branding-panel p {
+    font-size: 1.1rem;
+    color: var(--app-sidebar-text);
+}
+
 .login-card {
-    border-radius: 0.75rem;
+    width: 100%;
+    max-width: 450px;
+    border: none;
+    box-shadow: none; /* Shadow is on the wrapper now */
+    background-color: transparent;
 }

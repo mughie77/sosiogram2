@@ -79,35 +79,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <title>Login - Aplikasi Bimbingan Konseling</title>
 </head>
-<body class="login-container">
+<body>
 
-    <div class="login-card">
-        <div class="text-center mb-4">
-            <h3 class="fw-bold">Login Admin BK</h3>
-            <p class="text-muted">Gunakan akun Anda untuk masuk ke sistem.</p>
+    <div class="login-main-wrapper">
+        <!-- Form Container -->
+        <div class="login-form-container">
+            <div class="login-card">
+                <div class="text-center mb-5">
+                    <h3 class="fw-bold">Login Admin BK</h3>
+                    <p class="text-muted">Selamat datang kembali! Silakan masuk.</p>
+                </div>
+
+                <?php if (!empty($error_message)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <?php echo $error_message; ?>
+                    </div>
+                <?php endif; ?>
+
+                <form action="login.php" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="admin" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" value="admin" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-accent btn-lg">Masuk</button>
+                    </div>
+                </form>
+                <div class="text-center mt-4">
+                    <a href="index.php" class="text-muted small">Kembali ke Halaman Utama</a>
+                </div>
+            </div>
         </div>
 
-        <?php if (!empty($error_message)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?php echo $error_message; ?>
+        <!-- Branding Panel -->
+        <div class="login-branding-panel">
+            <div>
+                <i class="bi bi-person-workspace" style="font-size: 4rem; color: var(--app-accent-color);"></i>
+                <h2 class="mt-3">BK Sosiogram</h2>
+                <p>Memahami Interaksi, Membangun Potensi.</p>
             </div>
-        <?php endif; ?>
-
-        <form action="login.php" method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="cth: admin" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="cth: admin" required>
-            </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Masuk</button>
-            </div>
-        </form>
-        <div class="text-center mt-3">
-            <a href="index.php" class="text-muted small">Kembali ke Halaman Utama</a>
         </div>
     </div>
 
