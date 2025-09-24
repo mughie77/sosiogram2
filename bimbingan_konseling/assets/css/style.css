@@ -200,6 +200,7 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
 
 /* --- Landing Page Styling --- */
 .landing-navbar {
+    background-color: #ffffff;
     transition: background-color 0.3s ease-in-out;
 }
 
