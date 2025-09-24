@@ -23,6 +23,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: ' . $base_path . '/login.php');
     exit;
 }
+
+// --- Logika untuk Menu Aktif ---
+$current_page_url = $_SERVER['PHP_SELF'];
+
+function is_active($path, $current_page_url, $base_path) {
+    // Cek jika path yang diberikan ada di dalam URL halaman saat ini.
+    // Contoh: /bk/modules/siswa/daftar_siswa.php akan cocok dengan path /modules/siswa/
+    if (strpos($current_page_url, $base_path . $path) !== false) {
+        return 'active';
+    }
+    return '';
+}
 ?>
 <!doctype html>
 <html lang="id">
@@ -51,16 +63,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             <i class="bi bi-person-circle me-2"></i> Aplikasi BK
         </div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/dashboard.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/dashboard.php', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/dashboard.php">
                 <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/siswa/daftar_siswa.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/siswa/', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/siswa/daftar_siswa.php">
                 <i class="bi bi-people-fill me-2"></i> Data Siswa
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/sosiogram/data_pertemanan.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/data_pertemanan.php', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/sosiogram/data_pertemanan.php">
                 <i class="bi bi-diagram-3-fill me-2"></i> Data Pertemanan
             </a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="<?php echo $base_path; ?>/modules/sosiogram/sosiogram_chart.php">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/sosiogram/sosiogram_chart.php', $current_page_url, $base_path); ?>" href="<?php echo $base_path; ?>/modules/sosiogram/sosiogram_chart.php">
                 <i class="bi bi-bar-chart-line-fill me-2"></i> Sosiogram
             </a>
             <a class="list-group-item list-group-item-action list-group-item-danger p-3" href="<?php echo $base_path; ?>/logout.php">

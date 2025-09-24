@@ -14,6 +14,13 @@ body {
     font-family: 'Poppins', sans-serif; /* Contoh penggunaan font yang lebih modern */
 }
 
+/* --- Variables & Theme --- */
+:root {
+    --bs-primary-rgb: 13, 110, 253;
+    --app-accent-color: #6f42c1; /* Ungu lembut untuk sentuhan mewah */
+    --app-accent-rgb: 111, 66, 193;
+}
+
 /* --- Sidebar Styling --- */
 #wrapper {
     display: flex;
@@ -25,6 +32,23 @@ body {
     margin-left: -15rem;
     transition: margin 0.25s ease-out;
     width: 15rem;
+    border-right: 1px solid #dee2e6;
+}
+
+#sidebar-wrapper .list-group-item {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    border-left: 4px solid transparent;
+}
+
+#sidebar-wrapper .list-group-item.active {
+    background-color: rgba(var(--app-accent-rgb), 0.1);
+    color: var(--app-accent-color);
+    font-weight: 600;
+    border-left: 4px solid var(--app-accent-color);
+}
+
+#sidebar-wrapper .list-group-item:not(.active):hover {
+    background-color: #f0f2f5;
 }
 
 #sidebar-wrapper .sidebar-heading {
@@ -131,4 +155,21 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     font-weight: 600;
     background-color: #ffffff;
     border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.25rem;
+}
+
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-accent {
+    background-color: var(--app-accent-color);
+    border-color: var(--app-accent-color);
+    color: #fff;
+}
+
+.btn-accent:hover {
+    background-color: #5a359a; /* A slightly darker shade for hover */
+    border-color: #5a359a;
+    color: #fff;
 }

@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-accent">
                     <i class="bi bi-save-fill me-1"></i> Simpan Data
                 </button>
                 <a href="daftar_siswa.php" class="btn btn-secondary">

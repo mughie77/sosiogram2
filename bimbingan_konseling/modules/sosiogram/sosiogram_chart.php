@@ -84,7 +84,7 @@ if (isset($_GET['kelas']) && !empty($_GET['kelas'])) {
                 </select>
             </div>
             <div class="col-md-4">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-accent">
                     <i class="bi bi-bar-chart-line-fill me-1"></i> Tampilkan Sosiogram
                 </button>
             </div>

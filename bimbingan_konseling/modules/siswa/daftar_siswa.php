@@ -37,7 +37,7 @@ $result = mysqli_query($koneksi, $query);
         <i class="bi bi-people-fill me-1"></i>
         Daftar Siswa
         <div class="float-end">
-            <a href="tambah_siswa.php" class="btn btn-primary btn-sm">
+            <a href="tambah_siswa.php" class="btn btn-accent btn-sm">
                 <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
             </a>
             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">

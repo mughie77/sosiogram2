@@ -109,7 +109,7 @@ $result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-2">
+            <button type="submit" class="btn btn-accent mt-2">
                 <i class="bi bi-save-fill me-1"></i> Simpan Interaksi
             </button>
         </form>
