@@ -14,8 +14,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
 
-<!-- Custom JS -->
-<script src="<?php echo $base_path; ?>/assets/js/script.js"></script>
+<!-- Custom JS with Cache Busting -->
+<script src="<?php echo $base_path; ?>/assets/js/script.js?v=<?php echo time(); ?>"></script>
 
 <script>
 // Script untuk toggle sidebar

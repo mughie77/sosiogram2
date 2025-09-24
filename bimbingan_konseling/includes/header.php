@@ -49,8 +49,8 @@ function is_active($path, $current_page_url, $base_path) {
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo $base_path; ?>/assets/css/style.css">
+    <!-- Custom CSS with Cache Busting -->
+    <link rel="stylesheet" href="<?php echo $base_path; ?>/assets/css/style.css?v=<?php echo time(); ?>">
 
     <title>Dashboard - Aplikasi Bimbingan Konseling</title>
 </head>
