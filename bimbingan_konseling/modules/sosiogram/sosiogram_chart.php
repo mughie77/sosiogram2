@@ -69,7 +69,7 @@ if (isset($_GET['kelas']) && !empty($_GET['kelas'])) {
         Filter Sosiogram
     </div>
     <div class="card-body">
-        <form action="sosiogram_chart.php" method="GET" class="row g-3 align-items-end">
+        <form action="sosiogram_chart" method="GET" class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label for="kelas" class="form-label">Pilih Kelas untuk Ditampilkan</label>
                 <select class="form-select" id="kelas" name="kelas" required>

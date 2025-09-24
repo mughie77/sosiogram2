@@ -37,7 +37,7 @@ $result = mysqli_query($koneksi, $query);
         <i class="bi bi-people-fill me-1"></i>
         Daftar Siswa
         <div class="float-end">
-            <a href="tambah_siswa.php" class="btn btn-accent btn-sm">
+            <a href="tambah_siswa" class="btn btn-accent btn-sm">
                 <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
             </a>
             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
@@ -69,10 +69,10 @@ $result = mysqli_query($koneksi, $query);
                                 <td><?php echo htmlspecialchars($row['kelas']); ?></td>
                                 <td><?php echo htmlspecialchars($row['jenis_kelamin']); ?></td>
                                 <td>
-                                    <a href="edit_siswa.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm" title="Edit">
+                                    <a href="edit_siswa?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm" title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <a href="hapus_siswa.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?');">
+                                    <a href="hapus_siswa?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?');">
                                         <i class="bi bi-trash-fill"></i>
                                     </a>
                                 </td>
@@ -98,7 +98,7 @@ $result = mysqli_query($koneksi, $query);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="impor_siswa.php" method="post" enctype="multipart/form-data">
+                <form action="impor_siswa" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="csvFile" class="form-label">Pilih File CSV</label>
                         <input class="form-control" type="file" id="csvFile" name="csvFile" accept=".csv" required>

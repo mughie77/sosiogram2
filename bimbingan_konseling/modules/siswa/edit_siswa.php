@@ -14,7 +14,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $student_id = $_GET['id'];
 } else {
     // Jika ID tidak ada atau tidak valid, redirect
-    header('Location: daftar_siswa.php?status=error');
+    header('Location: daftar_siswa?status=error');
     exit;
 }
 
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (mysqli_query($koneksi, $query)) {
             // Jika berhasil, redirect ke halaman daftar siswa dengan pesan sukses
-            header('Location: daftar_siswa.php?status=success_edit');
+            header('Location: daftar_siswa?status=success_edit');
             exit;
         } else {
             // Jika gagal
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alamat = $student['alamat'];
     } else {
         // Jika siswa tidak ditemukan
-        header('Location: daftar_siswa.php?status=not_found');
+        header('Location: daftar_siswa?status=not_found');
         exit;
     }
 }
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Formulir Edit Data Siswa
     </div>
     <div class="card-body">
-        <form action="edit_siswa.php?id=<?php echo $student_id; ?>" method="POST">
+        <form action="edit_siswa?id=<?php echo $student_id; ?>" method="POST">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="nis" class="form-label">NIS (Nomor Induk Siswa)</label>
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="btn btn-accent">
                     <i class="bi bi-save-fill me-1"></i> Simpan Perubahan
                 </button>
-                <a href="daftar_siswa.php" class="btn btn-secondary">
+                <a href="daftar_siswa" class="btn btn-secondary">
                     <i class="bi bi-x-circle me-1"></i> Batal
                 </a>
             </div>

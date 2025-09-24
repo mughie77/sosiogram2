@@ -26,10 +26,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top landing-navbar">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
+            <a class="navbar-brand fw-bold" href="index">
                 <i class="bi bi-person-workspace"></i> BK Sosiogram
             </a>
-            <a href="login.php" class="btn btn-accent fw-bold">Masuk</a>
+            <a href="login" class="btn btn-accent fw-bold">Masuk</a>
         </div>
     </nav>
 
@@ -38,7 +38,7 @@
         <div class="container">
             <h1 class="display-4 fw-bold">Aplikasi Bimbingan Konseling Modern</h1>
             <p class="lead">Memahami dinamika sosial siswa melalui visualisasi sosiogram yang interaktif dan intuitif.</p>
-            <a href="login.php" class="btn btn-lg btn-light fw-bold text-dark">Mulai Gunakan Aplikasi</a>
+            <a href="login" class="btn btn-lg btn-light fw-bold text-dark">Mulai Gunakan Aplikasi</a>
         </div>
     </header>
 

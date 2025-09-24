@@ -1,0 +1,20 @@
+# --- Aturan URL Rewriting untuk Menghapus Ekstensi .php (Versi Final) ---
+
+# Aktifkan modul rewrite Apache
+RewriteEngine On
+
+# Pastikan base path dihiraukan jika ada (penting untuk sub-folder)
+RewriteBase /bimbingan_konseling/
+
+# --- Aturan Utama ---
+
+# 1. Jangan terapkan aturan pada file atau direktori yang sudah ada
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# 2. Rewrite request ke file .php yang sesuai
+#    - ^(.*)$ menangkap seluruh path request (e.g., "login", "modules/siswa/daftar_siswa")
+#    - $1.php menambahkan ekstensi .php
+#    - [L] berarti ini adalah aturan terakhir yang dijalankan jika cocok
+#    - [QSA] berarti "Query String Append", memastikan parameter GET (e.g., ?id=123) tetap ada
+RewriteRule ^(.*)$ $1.php [L,QSA]

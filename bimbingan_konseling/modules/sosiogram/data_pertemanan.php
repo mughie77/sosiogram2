@@ -71,7 +71,7 @@ $result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
         Tambah Data Interaksi
     </div>
     <div class="card-body">
-        <form action="data_pertemanan.php" method="POST" id="formPertemanan">
+        <form action="data_pertemanan" method="POST" id="formPertemanan">
             <div class="row align-items-end">
                 <div class="col-md-3 mb-3">
                     <label for="filter_kelas" class="form-label">1. Pilih Kelas</label>
@@ -149,7 +149,7 @@ $result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <a href="data_pertemanan.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?');">
+                                <a href="data_pertemanan?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?');">
                                     <i class="bi bi-trash-fill"></i>
                                 </a>
                             </td>
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (kelas) {
             // Fetch siswa berdasarkan kelas via AJAX
-            fetch(`get_siswa_by_kelas.php?kelas=${encodeURIComponent(kelas)}`)
+            fetch(`get_siswa_by_kelas?kelas=${encodeURIComponent(kelas)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

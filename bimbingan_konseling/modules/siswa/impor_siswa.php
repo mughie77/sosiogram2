@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
         // Jika semua berhasil, commit transaksi
         mysqli_commit($koneksi);
         fclose($handle);
-        header('Location: daftar_siswa.php?status=success_import');
+        header('Location: daftar_siswa?status=success_import');
         exit;
 
     } catch (Exception $e) {
@@ -81,13 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
         mysqli_rollback($koneksi);
         fclose($handle);
         // Redirect dengan pesan error spesifik
-        header('Location: daftar_siswa.php?status=error&msg=' . urlencode($e->getMessage()));
+        header('Location: daftar_siswa?status=error&msg=' . urlencode($e->getMessage()));
         exit;
     }
 
 } else {
     // Jika akses langsung atau tidak ada file
-    header('Location: daftar_siswa.php');
+    header('Location: daftar_siswa');
     exit;
 }
 ?>

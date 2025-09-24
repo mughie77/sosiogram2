@@ -28,7 +28,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         mysqli_commit($koneksi);
 
         // Redirect dengan pesan sukses
-        header('Location: daftar_siswa.php?status=success_delete');
+        header('Location: daftar_siswa?status=success_delete');
         exit;
 
     } catch (mysqli_sql_exception $exception) {
@@ -36,13 +36,13 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         mysqli_rollback($koneksi);
 
         // Redirect dengan pesan error
-        header('Location: daftar_siswa.php?status=error');
+        header('Location: daftar_siswa?status=error');
         exit;
     }
 
 } else {
     // Jika ID tidak valid atau tidak ada
-    header('Location: daftar_siswa.php?status=error');
+    header('Location: daftar_siswa?status=error');
     exit;
 }
 ?>

@@ -96,21 +96,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <form action="login.php" method="POST">
+                <form action="login" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="admin" required>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" value="admin" required>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-accent btn-lg">Masuk</button>
                     </div>
                 </form>
                 <div class="text-center mt-4">
-                    <a href="index.php" class="text-muted small">Kembali ke Halaman Utama</a>
+                    <a href="index" class="text-muted small">Kembali ke Halaman Utama</a>
                 </div>
             </div>
         </div>
