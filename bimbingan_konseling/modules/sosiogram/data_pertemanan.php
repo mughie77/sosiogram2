@@ -43,19 +43,44 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 }
 
 
-// Ambil daftar kelas unik dari tabel siswa
+// Ambil daftar kelas unik dari tabel siswa untuk kedua form
 $query_kelas = "SELECT DISTINCT kelas FROM siswa ORDER BY kelas ASC";
 $result_kelas = mysqli_query($koneksi, $query_kelas);
 
-// Ambil data pertemanan yang sudah ada untuk ditampilkan
+// --- Logika untuk Filter dan Pencarian Daftar Pertemanan ---
+$filter_kelas_list = isset($_GET['filter_kelas_list']) ? $_GET['filter_kelas_list'] : '';
+$search_nama = isset($_GET['search_nama']) ? $_GET['search_nama'] : '';
+
 $query_pertemanan = "
     SELECT p.id, pemilih.nama_lengkap as nama_pemilih, dipilih.nama_lengkap as nama_dipilih, p.status, p.kelas
     FROM pertemanan p
     JOIN siswa pemilih ON p.id_siswa_pemilih = pemilih.id
     JOIN siswa dipilih ON p.id_siswa_dipilih = dipilih.id
-    ORDER BY p.kelas, nama_pemilih, nama_dipilih
+    WHERE 1=1
 ";
-$result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
+$params = [];
+$types = '';
+
+if (!empty($filter_kelas_list)) {
+    $query_pertemanan .= " AND p.kelas = ?";
+    $params[] = $filter_kelas_list;
+    $types .= 's';
+}
+if (!empty($search_nama)) {
+    $query_pertemanan .= " AND (pemilih.nama_lengkap LIKE ? OR dipilih.nama_lengkap LIKE ?)";
+    $search_param = "%" . $search_nama . "%";
+    $params[] = $search_param;
+    $params[] = $search_param;
+    $types .= 'ss';
+}
+$query_pertemanan .= " ORDER BY p.kelas, nama_pemilih, nama_dipilih";
+
+$stmt_pertemanan = mysqli_prepare($koneksi, $query_pertemanan);
+if (!empty($params)) {
+    mysqli_stmt_bind_param($stmt_pertemanan, $types, ...$params);
+}
+mysqli_stmt_execute($stmt_pertemanan);
+$result_pertemanan = mysqli_stmt_get_result($stmt_pertemanan);
 
 ?>
 
@@ -77,7 +102,10 @@ $result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
                     <label for="filter_kelas" class="form-label">1. Pilih Kelas</label>
                     <select class="form-select" id="filter_kelas" name="filter_kelas" required>
                         <option value="">-- Semua Kelas --</option>
-                        <?php while ($row_kelas = mysqli_fetch_assoc($result_kelas)): ?>
+                        <?php
+                        mysqli_data_seek($result_kelas, 0); // Reset pointer result set
+                        while ($row_kelas = mysqli_fetch_assoc($result_kelas)):
+                        ?>
                             <option value="<?php echo htmlspecialchars($row_kelas['kelas']); ?>">
                                 <?php echo htmlspecialchars($row_kelas['kelas']); ?>
                             </option>
@@ -115,6 +143,41 @@ $result_pertemanan = mysqli_query($koneksi, $query_pertemanan);
         </form>
     </div>
 </div>
+
+<!-- Form Filter dan Pencarian Daftar -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <i class="bi bi-funnel-fill me-1"></i>
+        Filter & Pencarian Daftar Interaksi
+    </div>
+    <div class="card-body">
+        <form action="data_pertemanan" method="GET" class="row g-3">
+            <div class="col-md-5">
+                <label for="search_nama" class="form-label">Cari Nama Siswa</label>
+                <input type="text" class="form-control" id="search_nama" name="search_nama" placeholder="Masukkan nama pemilih atau yang dipilih..." value="<?php echo htmlspecialchars($search_nama); ?>">
+            </div>
+            <div class="col-md-5">
+                <label for="filter_kelas_list" class="form-label">Filter per Kelas</label>
+                <select class="form-select" id="filter_kelas_list" name="filter_kelas_list">
+                    <option value="">-- Semua Kelas --</option>
+                    <?php
+                    mysqli_data_seek($result_kelas, 0); // Reset pointer
+                    while($row_kelas = mysqli_fetch_assoc($result_kelas)):
+                    ?>
+                        <option value="<?php echo htmlspecialchars($row_kelas['kelas']); ?>" <?php echo ($filter_kelas_list === $row_kelas['kelas']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($row_kelas['kelas']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2 w-100">Cari</button>
+                <a href="data_pertemanan" class="btn btn-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <!-- Tabel data yang sudah ada -->
 <div class="card shadow-sm">
