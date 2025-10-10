@@ -9,20 +9,34 @@ require_once '../../config/koneksi.php';
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $student_id = $_GET['id'];
 
-    // Buat query untuk menghapus siswa
-    // Juga hapus relasi pertemanan yang terkait dengan siswa ini untuk menjaga integritas data
-    $query_delete_pertemanan = "DELETE FROM pertemanan WHERE id_siswa_pemilih = $student_id OR id_siswa_dipilih = $student_id";
-    $query_delete_siswa = "DELETE FROM siswa WHERE id = $student_id";
-
-    // Mulai transaksi
+    // Mulai transaksi untuk memastikan integritas data
     mysqli_begin_transaction($koneksi);
 
     try {
-        // Hapus relasi pertemanan
-        mysqli_query($koneksi, $query_delete_pertemanan);
+        // 1. Ambil user_id dari siswa yang akan dihapus
+        $stmt_get_user = mysqli_prepare($koneksi, "SELECT user_id FROM siswa WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_get_user, "i", $student_id);
+        mysqli_stmt_execute($stmt_get_user);
+        $result_user = mysqli_stmt_get_result($stmt_get_user);
+        $user_data = mysqli_fetch_assoc($result_user);
+        $user_id_to_delete = $user_data ? $user_data['user_id'] : null;
 
-        // Hapus siswa
-        mysqli_query($koneksi, $query_delete_siswa);
+        // 2. Hapus relasi pertemanan yang terkait (sudah ada, tapi kita pastikan lagi)
+        $stmt_del_pertemanan = mysqli_prepare($koneksi, "DELETE FROM pertemanan WHERE id_siswa_pemilih = ? OR id_siswa_dipilih = ?");
+        mysqli_stmt_bind_param($stmt_del_pertemanan, "ii", $student_id, $student_id);
+        mysqli_stmt_execute($stmt_del_pertemanan);
+
+        // 3. Hapus data siswa dari tabel 'siswa'
+        $stmt_del_siswa = mysqli_prepare($koneksi, "DELETE FROM siswa WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_del_siswa, "i", $student_id);
+        mysqli_stmt_execute($stmt_del_siswa);
+
+        // 4. Jika ada user_id terkait, hapus juga dari tabel 'users'
+        if ($user_id_to_delete) {
+            $stmt_del_user = mysqli_prepare($koneksi, "DELETE FROM users WHERE id = ?");
+            mysqli_stmt_bind_param($stmt_del_user, "i", $user_id_to_delete);
+            mysqli_stmt_execute($stmt_del_user);
+        }
 
         // Jika semua query berhasil, commit transaksi
         mysqli_commit($koneksi);

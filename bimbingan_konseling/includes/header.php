@@ -54,6 +54,9 @@ function is_active($path_segment, $current_path) {
                 <a class="list-group-item <?php echo is_active('/modules/sosiogram/sosiogram_chart', $current_path); ?>" href="<?php echo BASE_URL; ?>/modules/sosiogram/sosiogram_chart">
                     <i class="bi bi-bar-chart-line-fill"></i> Sosiogram
                 </a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3 <?php echo is_active('/modules/users', $current_path); ?>" href="<?php echo BASE_URL; ?>/modules/users/manajemen_user">
+                    <i class="bi bi-person-badge"></i> Manajemen User
+                </a>
                 <a class="list-group-item list-group-item-logout" href="<?php echo BASE_URL; ?>/logout">
                     <i class="bi bi-box-arrow-right"></i> Keluar
                 </a>

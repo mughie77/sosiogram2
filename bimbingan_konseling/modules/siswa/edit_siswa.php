@@ -42,21 +42,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Jika tidak ada error, update data di database
     if (empty($errors)) {
-        $query = "UPDATE siswa SET
-                    nis = '$nis',
-                    nama_lengkap = '$nama_lengkap',
-                    kelas = '$kelas',
-                    jenis_kelamin = '$jenis_kelamin',
-                    alamat = '$alamat'
-                  WHERE id = $student_id";
+        mysqli_begin_transaction($koneksi);
+        try {
+            // 1. Update tabel siswa
+            $stmt_siswa = mysqli_prepare($koneksi, "UPDATE siswa SET nis = ?, nama_lengkap = ?, kelas = ?, jenis_kelamin = ?, alamat = ? WHERE id = ?");
+            mysqli_stmt_bind_param($stmt_siswa, "sssssi", $nis, $nama_lengkap, $kelas, $jenis_kelamin, $alamat, $student_id);
+            mysqli_stmt_execute($stmt_siswa);
 
-        if (mysqli_query($koneksi, $query)) {
-            // Jika berhasil, redirect ke halaman daftar siswa dengan pesan sukses
+            // 2. Ambil user_id dari siswa
+            $stmt_get_user = mysqli_prepare($koneksi, "SELECT user_id FROM siswa WHERE id = ?");
+            mysqli_stmt_bind_param($stmt_get_user, "i", $student_id);
+            mysqli_stmt_execute($stmt_get_user);
+            $user_id = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_get_user))['user_id'];
+
+            if ($user_id) {
+                // 3. Update username di tabel users
+                $stmt_user = mysqli_prepare($koneksi, "UPDATE users SET username = ? WHERE id = ?");
+                mysqli_stmt_bind_param($stmt_user, "si", $nis, $user_id);
+                mysqli_stmt_execute($stmt_user);
+
+                // 4. Jika password baru diisi, update password
+                if (!empty($_POST['password'])) {
+                    $new_password_hashed = sha1($_POST['password']);
+                    $stmt_pass = mysqli_prepare($koneksi, "UPDATE users SET password = ? WHERE id = ?");
+                    mysqli_stmt_bind_param($stmt_pass, "si", $new_password_hashed, $user_id);
+                    mysqli_stmt_execute($stmt_pass);
+                }
+            }
+
+            mysqli_commit($koneksi);
             header('Location: daftar_siswa?status=success_edit');
             exit;
-        } else {
-            // Jika gagal
-            $errors[] = "Gagal memperbarui data di database: " . mysqli_error($koneksi);
+
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $errors[] = "Gagal memperbarui data: " . $e->getMessage();
         }
     }
 } else {
@@ -102,19 +122,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="edit_siswa?id=<?php echo $student_id; ?>" method="POST">
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="nis" class="form-label">NIS (Nomor Induk Siswa)</label>
-                    <input type="text" class="form-control" id="nis" name="nis" value="<?php echo htmlspecialchars($nis); ?>" required>
-                </div>
-                <div class="col-md-6 mb-3">
                     <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
                     <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="<?php echo htmlspecialchars($nama_lengkap); ?>" required>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="kelas" class="form-label">Kelas</label>
                     <input type="text" class="form-control" id="kelas" name="kelas" placeholder="Contoh: X-A, XI-IPA-2" value="<?php echo htmlspecialchars($kelas); ?>" required>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nis" class="form-label">Username (NIS)</label>
+                    <input type="text" class="form-control" id="nis" name="nis" value="<?php echo htmlspecialchars($nis); ?>" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label">Password Baru (Opsional)</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Isi hanya jika ingin mengubah">
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                     <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
