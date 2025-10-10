@@ -30,12 +30,15 @@ Dengan antarmuka yang bersih, minimalis, dan responsif, aplikasi ini mempermudah
 
 1.  **Dapatkan Kode Sumber**: Unduh atau clone repositori ini ke direktori server web Anda (misal: `htdocs`).
 2.  **Buat Database**: Buka phpMyAdmin, buat database baru (misal: `db_bimbingan_konseling`), lalu impor file `database.sql` dari proyek ini.
-3.  **Konfigurasi Koneksi**: Edit file `config/koneksi.php` jika username atau password database Anda bukan `root` dan kosong.
-4.  **Konfigurasi `.htaccess` (PENTING)**:
+3.  **Konfigurasi Koneksi**: Edit file `config/koneksi.php` jika kredensial database Anda berbeda.
+4.  **Konfigurasi URL (WAJIB)**:
+    - Buka file `config/app_config.php`.
+    - Ubah nilai `define('BASE_URL', 'https://bk.smkn2bondowoso.sch.id/');` agar sesuai dengan alamat lengkap aplikasi Anda. **Pastikan ada garis miring `/` di akhir.**
+5.  **Konfigurasi `.htaccess`**:
     - Buka file `.htaccess` di folder utama proyek.
-    - Ubah baris `RewriteBase /bimbingan_konseling/` agar sesuai dengan nama folder proyek Anda. Jika proyek ada di `htdocs/bk-app`, ubah menjadi `RewriteBase /bk-app/`.
+    - Ubah baris `RewriteBase /` agar sesuai dengan path sub-folder Anda. Jika aplikasi ada di `http://localhost/bk-app/`, ubah menjadi `RewriteBase /bk-app/`. Jika di domain utama, biarkan `/`.
     - Pastikan modul `mod_rewrite` di server Apache Anda sudah aktif.
-5.  **Jalankan Aplikasi**: Buka `http://localhost/nama_folder_proyek/` di browser Anda.
+6.  **Jalankan Aplikasi**: Buka alamat yang sudah Anda atur di `BASE_URL`.
 
 ## 📖 Cara Menggunakan
 
