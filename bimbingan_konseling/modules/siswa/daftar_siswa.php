@@ -15,7 +15,13 @@ if (isset($_GET['status'])) {
         $message = '<div class="alert alert-success" role="alert">Data siswa berhasil dihapus.</div>';
     } elseif ($_GET['status'] === 'success_import') {
         $message = '<div class="alert alert-success" role="alert">Data siswa berhasil diimpor dari CSV.</div>';
-    } elseif ($_GET['status'] === 'error') {
+    } elseif ($_GET['status'] === 'generate_success') {
+        $created = isset($_GET['created']) ? (int)$_GET['created'] : 0;
+        $failed = isset($_GET['failed']) ? (int)$_GET['failed'] : 0;
+        $message = '<div class="alert alert-success" role="alert">Proses selesai. Berhasil membuat ' . $created . ' akun baru. Gagal: ' . $failed . '.</div>';
+    } elseif ($_GET['status'] === 'no_accounts_needed') {
+        $message = '<div class="alert alert-info" role="alert">Semua siswa sudah memiliki akun login.</div>';
+    } elseif ($_GET['status'] === 'error' || $_GET['status'] === 'generate_error') {
         $message = '<div class="alert alert-danger" role="alert">Terjadi kesalahan. Silakan coba lagi.</div>';
     }
 }
@@ -111,6 +117,9 @@ $result = mysqli_stmt_get_result($stmt);
             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Impor CSV
             </button>
+            <a href="generate_akun" class="btn btn-info btn-sm" onclick="return confirm('Ini akan membuat akun login untuk semua siswa yang belum memilikinya. Lanjutkan?');">
+                <i class="bi bi-person-fill-add me-1"></i> Generate Akun
+            </a>
         </div>
     </div>
     <div class="card-body">

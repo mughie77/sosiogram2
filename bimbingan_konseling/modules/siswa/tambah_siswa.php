@@ -30,17 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "NIS sudah terdaftar. Harap gunakan NIS yang lain.";
     }
 
-    // Jika tidak ada error, masukkan data ke database
+    // Jika tidak ada error, proses data dengan transaksi
     if (empty($errors)) {
-        $query = "INSERT INTO siswa (nis, nama_lengkap, kelas, jenis_kelamin, alamat) VALUES ('$nis', '$nama_lengkap', '$kelas', '$jenis_kelamin', '$alamat')";
+        mysqli_begin_transaction($koneksi);
 
-        if (mysqli_query($koneksi, $query)) {
-            // Jika berhasil, redirect ke halaman daftar siswa dengan pesan sukses
+        try {
+            // 1. Buat akun user baru
+            $password_hashed = sha1($nis); // Menggunakan NIS sebagai password default
+            $role = 'siswa';
+
+            $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_user, "sss", $nis, $password_hashed, $role);
+            mysqli_stmt_execute($stmt_user);
+
+            $user_id = mysqli_insert_id($koneksi);
+            if ($user_id === 0) {
+                throw new Exception("Gagal membuat akun user.");
+            }
+
+            // 2. Masukkan data siswa dengan user_id yang sudah terhubung
+            $stmt_siswa = mysqli_prepare($koneksi, "INSERT INTO siswa (nis, nama_lengkap, kelas, jenis_kelamin, alamat, user_id) VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_siswa, "sssssi", $nis, $nama_lengkap, $kelas, $jenis_kelamin, $alamat, $user_id);
+            mysqli_stmt_execute($stmt_siswa);
+
+            // Jika semua berhasil, commit transaksi
+            mysqli_commit($koneksi);
+
+            // Redirect ke halaman daftar siswa dengan pesan sukses
             header('Location: daftar_siswa?status=success_add');
             exit;
-        } else {
-            // Jika gagal
-            $errors[] = "Gagal menyimpan data ke database: " . mysqli_error($koneksi);
+
+        } catch (Exception $e) {
+            // Jika ada error, rollback semua perubahan
+            mysqli_rollback($koneksi);
+            $errors[] = "Gagal menyimpan data: " . $e->getMessage();
         }
     }
 }

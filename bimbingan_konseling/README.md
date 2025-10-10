@@ -6,79 +6,51 @@ Dengan antarmuka yang bersih, minimalis, dan responsif, aplikasi ini mempermudah
 
 ## ✨ Fitur Utama
 
-- **Sistem Autentikasi**: Sistem login yang aman khusus untuk Admin/Guru BK.
+- **Sistem Autentikasi Ganda**: Sistem login terpisah untuk Admin/Guru BK dan Siswa.
 - **Manajemen Data Siswa**:
-    - **CRUD**: Tambah, lihat, edit, dan hapus data siswa dengan mudah.
-    - **Impor Massal**: Impor ratusan data siswa secara cepat dari file **CSV**, menghemat waktu entri manual.
+    - **CRUD**: Tambah, lihat, edit, dan hapus data siswa.
+    - **Impor Massal**: Impor data siswa secara cepat dari file **CSV**.
+    - **Pembuatan Akun Otomatis**: Setiap siswa yang ditambahkan (baik manual maupun impor) akan otomatis dibuatkan akun login.
 - **Manajemen Interaksi Sosial**:
-    - Catat pilihan **positif** (pertemanan) dan **negatif** (penolakan) antar siswa.
-    - Antarmuka yang intuitif untuk merekam data, dengan filter per kelas untuk mempermudah pencarian siswa.
+    - **Input oleh Siswa**: Siswa dapat login dan memilih sendiri teman yang disukai dan tidak disukai.
+    - **Input oleh Admin**: Admin juga dapat mencatat interaksi secara manual jika diperlukan.
 - **Visualisasi Sosiogram**:
-    - **Chart Interaktif**: Hasilkan diagram sosiogram secara otomatis berdasarkan data interaksi yang telah dimasukkan.
-    - **Filter per Kelas**: Fokus pada analisis sosial untuk kelas tertentu.
-    - **Unduh Laporan**: Simpan sosiogram yang ditampilkan sebagai file gambar (PNG) untuk keperluan dokumentasi atau laporan.
+    - **Chart Interaktif**: Hasilkan diagram sosiogram secara otomatis.
+    - **Filter & Analisis**: Filter per kelas, lihat dalam mode layar penuh, dan unduh sebagai gambar PNG lengkap dengan legenda nama.
 
 ## 🚀 Teknologi yang Digunakan
 
-- **Backend**: PHP Native (murni, tanpa framework)
-- **Frontend**: HTML, CSS, JavaScript (Vanilla JS)
+- **Backend**: PHP Native
+- **Frontend**: HTML, CSS, JavaScript
 - **Framework UI**: Bootstrap 5
-- **Charting Library**: Chart.js
+- **Charting Library**: Chart.js, Chart.js Datalabels, html2canvas
 - **Database**: MySQL
 
 ## ⚙️ Panduan Instalasi dan Setup
 
-Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lingkungan lokal Anda (misalnya menggunakan XAMPP atau WAMP).
-
-### 1. Dapatkan Kode Sumber
-- Unduh atau clone repositori ini ke komputer Anda.
-- Letakkan folder proyek `bimbingan_konseling` di dalam direktori root server web Anda (misalnya, `C:\xampp\htdocs\` untuk XAMPP).
-
-### 2. Buat Database
-- Buka phpMyAdmin (`http://localhost/phpmyadmin`).
-- Buat database baru dengan nama `db_bimbingan_konseling`.
-- Pilih database yang baru dibuat, lalu buka tab **Import**.
-- Klik "Choose File" dan pilih file `database.sql` yang ada di dalam folder proyek ini.
-- Klik **Go** untuk memulai proses impor. Tabel (`users`, `siswa`, `pertemanan`) dan data admin default akan otomatis dibuat.
-
-### 3. Konfigurasi Koneksi Database
-- Buka file `bimbingan_konseling/config/koneksi.php`.
-- Sesuaikan nilai variabel berikut jika kredensial database Anda berbeda dari default:
-  ```php
-  $db_host = 'localhost';
-  $db_user = 'root';
-  $db_pass = '';
-  $db_name = 'db_bimbingan_konseling';
-  ```
-
-### 4. Jalankan Aplikasi
-- Buka browser web Anda dan akses alamat: `http://localhost/bimbingan_konseling/`
-- Anda akan disambut oleh halaman landing. Klik tombol "Masuk" untuk menuju halaman login.
+1.  **Dapatkan Kode Sumber**: Unduh atau clone repositori ini ke direktori server web Anda (misal: `htdocs`).
+2.  **Buat Database**: Buka phpMyAdmin, buat database baru (misal: `db_bimbingan_konseling`), lalu impor file `database.sql` dari proyek ini.
+3.  **Konfigurasi Koneksi**: Edit file `config/koneksi.php` jika username atau password database Anda bukan `root` dan kosong.
+4.  **Konfigurasi `.htaccess` (PENTING)**:
+    - Buka file `.htaccess` di folder utama proyek.
+    - Ubah baris `RewriteBase /bimbingan_konseling/` agar sesuai dengan nama folder proyek Anda. Jika proyek ada di `htdocs/bk-app`, ubah menjadi `RewriteBase /bk-app/`.
+    - Pastikan modul `mod_rewrite` di server Apache Anda sudah aktif.
+5.  **Jalankan Aplikasi**: Buka `http://localhost/nama_folder_proyek/` di browser Anda.
 
 ## 📖 Cara Menggunakan
 
-1.  **Login ke Sistem**:
-    - Gunakan kredensial admin default untuk masuk:
-      - **Username**: `admin`
-      - **Password**: `admin`
+### Untuk Admin / Guru BK
 
-2.  **Kelola Data Siswa**:
-    - Buka menu **Data Siswa**.
-    - Tambahkan beberapa siswa secara manual atau gunakan fitur **Impor CSV** untuk mengunggah data secara massal.
-    - **Format CSV**: Pastikan file CSV Anda memiliki 5 kolom dengan urutan: `nis,nama_lengkap,kelas,jenis_kelamin,alamat`. Baris pertama (header) akan diabaikan oleh sistem.
+1.  **Login**: Gunakan kredensial `admin` / `admin`.
+2.  **Tambah Siswa**: Buka menu **Data Siswa**. Saat siswa baru ditambahkan, akun login mereka (username & password = NIS) akan dibuat secara otomatis.
+3.  **Generate Akun Siswa Lama**: Jika ada siswa yang datanya sudah ada sebelum fitur login siswa ditambahkan, klik tombol **Generate Akun** untuk membuatkan mereka akun secara massal.
+4.  **Lihat Sosiogram**: Buka menu **Sosiogram**, pilih kelas, dan lihat hasilnya.
 
-3.  **Catat Interaksi Pertemanan**:
-    - Buka menu **Data Pertemanan**.
-    - **Pilih kelas** terlebih dahulu untuk memuat daftar siswa.
-    - Pilih **siswa pemilih**, lalu pilih satu atau lebih **siswa yang dipilih**.
-    - Tentukan status interaksi (**Positif** atau **Negatif**), lalu simpan.
-    - Ulangi untuk siswa lain hingga data interaksi cukup untuk dianalisis.
+### Untuk Siswa
 
-4.  **Lihat Sosiogram**:
-    - Buka menu **Sosiogram**.
-    - Pilih kelas yang ingin Anda analisis, lalu klik **Tampilkan Sosiogram**.
-    - Diagram akan muncul, menampilkan siswa sebagai titik (biru untuk laki-laki, pink untuk perempuan) dan interaksi sebagai garis panah (hijau untuk positif, merah untuk negatif).
-    - Gunakan tombol **Unduh** untuk menyimpan diagram sebagai file PNG.
+1.  **Login**: Gunakan **NIS** sebagai username dan **NIS** sebagai password.
+2.  **Dashboard**: Setelah login, siswa akan melihat profil singkatnya.
+3.  **Pilih Pertemanan**: Buka menu **Pilih Pertemanan** untuk memilih teman yang disukai dan tidak disukai. Data ini akan langsung digunakan untuk sosiogram.
 
 ---
 Terima kasih telah menggunakan aplikasi ini!

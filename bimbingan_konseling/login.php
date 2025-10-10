@@ -4,10 +4,15 @@
 // Memulai session
 session_start();
 
-// Jika pengguna sudah login, redirect ke dashboard
+// Jika pengguna sudah login, redirect ke dashboard yang sesuai
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
-    exit;
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: dashboard');
+        exit;
+    } elseif ($_SESSION['role'] === 'siswa') {
+        header('Location: dashboard_siswa');
+        exit;
+    }
 }
 
 // Include file koneksi database
@@ -26,28 +31,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error_message = 'Username dan password tidak boleh kosong.';
     } else {
-        // Escape input untuk keamanan (meskipun prepared statement lebih baik)
-        $username = mysqli_real_escape_string($koneksi, $username);
-
-        // Query untuk mencari user admin
-        // Catatan: Di aplikasi production, gunakan prepared statements untuk mencegah SQL Injection
-        $query = "SELECT id, username, password, role FROM users WHERE username = '$username' AND role = 'admin'";
-        $result = mysqli_query($koneksi, $query);
+        // Gunakan prepared statement untuk keamanan
+        $stmt = mysqli_prepare($koneksi, "SELECT id, username, password, role FROM users WHERE username = ?");
+        mysqli_stmt_bind_param($stmt, "s", $username);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
         if ($result && mysqli_num_rows($result) === 1) {
             $user = mysqli_fetch_assoc($result);
 
-            // Verifikasi password (menggunakan sha1 untuk contoh ini, sesuai permintaan awal)
-            // Di dunia nyata, gunakan password_verify($password, $user['password'])
+            // Verifikasi password (menggunakan sha1 untuk contoh ini)
             if ($user['password'] === sha1($password)) {
-                // Jika password cocok, set session
+                // Set session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Redirect ke halaman dashboard
-                header('Location: dashboard.php');
-                exit;
+                // Redirect berdasarkan role
+                if ($user['role'] === 'admin') {
+                    header('Location: dashboard');
+                    exit;
+                } elseif ($user['role'] === 'siswa') {
+                    header('Location: dashboard_siswa');
+                    exit;
+                }
             } else {
                 // Jika password salah
                 $error_message = 'Username atau password salah.';
@@ -72,10 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
 
     <title>Login - Aplikasi Bimbingan Konseling</title>
 </head>
@@ -86,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-form-container">
             <div class="login-card">
                 <div class="text-center mb-5">
-                    <h3 class="fw-bold">Login Admin BK</h3>
-                    <p class="text-muted">Selamat datang kembali! Silakan masuk.</p>
+                    <h3 class="fw-bold">Login Sistem</h3>
+                    <p class="text-muted">Gunakan akun Anda untuk masuk.</p>
                 </div>
 
                 <?php if (!empty($error_message)): ?>
@@ -98,12 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form action="login" method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
+                        <label for="username" class="form-label">Username (NIS untuk Siswa)</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username..." required>
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password..." required>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-accent btn-lg">Masuk</button>
@@ -126,6 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

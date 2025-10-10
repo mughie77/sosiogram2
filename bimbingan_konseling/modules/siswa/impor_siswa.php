@@ -56,17 +56,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
             }
 
             // Cek duplikasi NIS sebelum insert
-            $check_query = "SELECT id FROM siswa WHERE nis = '$nis'";
+            $check_query = "SELECT id FROM users WHERE username = '$nis'";
             $check_result = mysqli_query($koneksi, $check_query);
             if (mysqli_num_rows($check_result) > 0) {
-                // Jika sudah ada, lewati baris ini (atau bisa juga throw exception)
+                // Jika user dengan NIS ini sudah ada, lewati baris ini
                 continue;
             }
 
-            // Insert data ke database
-            $query = "INSERT INTO siswa (nis, nama_lengkap, kelas, jenis_kelamin, alamat) VALUES ('$nis', '$nama_lengkap', '$kelas', '$jenis_kelamin', '$alamat')";
-            if (!mysqli_query($koneksi, $query)) {
-                throw new Exception("Gagal memasukkan data pada baris $row_count: " . mysqli_error($koneksi));
+            // 1. Buat akun user baru
+            $password_hashed = sha1($nis);
+            $role = 'siswa';
+            $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_user, "sss", $nis, $password_hashed, $role);
+            mysqli_stmt_execute($stmt_user);
+
+            $user_id = mysqli_insert_id($koneksi);
+            if ($user_id === 0) {
+                // Lanjutkan ke baris berikutnya jika user gagal dibuat, jangan hentikan seluruh proses
+                continue;
+            }
+
+            // 2. Insert data siswa dengan user_id yang terhubung
+            $stmt_siswa = mysqli_prepare($koneksi, "INSERT INTO siswa (nis, nama_lengkap, kelas, jenis_kelamin, alamat, user_id) VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_siswa, "sssssi", $nis, $nama_lengkap, $kelas, $jenis_kelamin, $alamat, $user_id);
+            if (!mysqli_stmt_execute($stmt_siswa)) {
+                // Jika siswa gagal dibuat, user yang sudah terbuat akan di-rollback oleh transaksi
+                throw new Exception("Gagal memasukkan data siswa pada baris $row_count (NIS: $nis).");
             }
         }
 
